@@ -12,7 +12,7 @@ my_gps = MicropyGPS()
 # Define the UART pins and create a UART object
 gps_serial = UART(0, baudrate=9600, tx=Pin(cfg.gps_tx), rx=Pin(cfg.gps_rx))
 
-def get_gps():
+def get_gps(): # Get all gps data as a string
     try:
         while gps_serial.any():
             data = gps_serial.read()
@@ -31,12 +31,12 @@ def get_gps():
                     gps_data = str(my_gps.latitude_string()), str(my_gps.longitude_string()), str(my_gps.altitude), str(my_gps.satellites_in_use), str(my_gps.hdop)
                     return gps_data
             
-    except Exception as e:
+    except Exception as e: # Sends error message as a string starting with "*"
         print(f"An error occurred: {e}")
         error = "*" + str(e)
         return error
     
-def get_time():
+def get_time(): # Get gps time
     try:
         while gps_serial.any():
             data = gps_serial.read()
@@ -53,7 +53,7 @@ def get_time():
         error = "*" + str(e)
         return error
     
-def get_long():
+def get_long(): # Get gps longitude
     try:
         while gps_serial.any():
             data = gps_serial.read()
@@ -70,7 +70,7 @@ def get_long():
         error = "*" + str(e)
         return error
     
-def get_lat():
+def get_lat(): # Get gps latitude
     try:
         while gps_serial.any():
             data = gps_serial.read()
@@ -87,7 +87,7 @@ def get_lat():
         error = "*" + str(e)
         return error
 
-def get_alt():
+def get_alt(): # get gps (buoy) altitude
     try:
         while gps_serial.any():
             data = gps_serial.read()
@@ -104,7 +104,7 @@ def get_alt():
         error = "*" + str(e)
         return error
     
-def get_sats():
+def get_sats(): # Get gps # of satelies
     try:
         while gps_serial.any():
             data = gps_serial.read()
@@ -121,7 +121,7 @@ def get_sats():
         error = "*" + str(e)
         return error
 
-def get_hdop():
+def get_hdop(): # Get the hdop
     try:
         while gps_serial.any():
             data = gps_serial.read()

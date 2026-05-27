@@ -38,7 +38,7 @@ def read_battery():
     return bat_v
 
 def build_record():
-    #Combine the data together
+    # Combine the data together
     temp_c = read_water_temp()
     timestamp = read_time()
     in_temp = rtc.get_temp_c
@@ -49,7 +49,7 @@ def build_record():
     gps_hdop = GPS.get_hdop()
     gps_d = read_gps()
 
-    record = {
+    record = { # Directory of all data values to be saved and trasmitted
         "timestamp": timestamp,
         "water_temp_c": temp_c,
         "gps_lat": gps_lat,

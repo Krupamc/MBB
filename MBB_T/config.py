@@ -1,10 +1,20 @@
 # Configuration of the MBB (My Buddy Buoy :D):
 
+""" This is the config.py file of the MBB. 
+    If you are building the buoy using the exact same parts and setup,
+    you will not have to change much. But if you are doing something different
+    some changes will have to be made. 
+    NOTE: This may include changing some sensor code and main.py depending on your setup
+"""
+
+# How often the buoy colects data:
 alarm_interval = 1
 
 # ---GPIO---
+# General Input Output Pins Layout
+# ex: Module - Protocal/Pins reqiured
 
-# RTC - I2C
+# RTC (Real Time Clock Moudule) - I2C
 rtc_sda=6 #BIG PROBLEM for later me ;)
 rtc_scl=7 #Resoder board resister
 alarm_pin = 30 #Solder the R7 resistor, connect the INT pin to the RUN pin of the Pico, to reset Pico when DS3231 alarm clock outputs low level.
@@ -17,7 +27,6 @@ gps_tx = 0
 gps_rx = 1
 
 # Micro SD Card - SPI
-# Adjust these pins to your wiring
 sd_spi_id = 0        # or 0
 sd_sck   = 18        # example
 sd_mosi  = 19
@@ -25,7 +34,7 @@ sd_miso  = 16
 sd_cs    = 17        # chip select
 
 #---LoRa---
-lora_frq_khz = 915000  # 915 MHz for North America; use 868000 for EU
+lora_frq_khz = 915000  # 915 MHz for North America; use 868 MHZ for EU
 
 lora_cfg = {
     "freq_khz": lora_frq_khz,

@@ -3,7 +3,7 @@ import os
 import sdcard  # sdcard.py driver
 import config as cfg
 
-def mount_sd():
+def mount_sd(): # ...mount the micosd...?
     spi = SPI(
         cfg.sd_spi_id,
         baudrate=1_000_000,
@@ -22,8 +22,8 @@ def mount_sd():
     print("SD mounted at /sd")
     return sd
 
-def ensure_dir(path):
+def ensure_dir(path): # Check if path exists
     try:
         os.mkdir(path)
     except OSError:
-        pass  # already exists
+        pass 

@@ -4,7 +4,7 @@ import sd_storage
 
 LOG_DIR = "/sd/logs"
 
-header = [
+header = [ # All csv headers
     "timestamp,"
     "water_temp_c,"
     "lat,"
@@ -17,7 +17,8 @@ header = [
     "seq"
     ]
 
-def get_monthly_filename():
+# Monthly csvs 
+def get_monthly_filename(): 
     dt = rtc.get_datetime()
     fname = "{:04d}-{:02d}.csv".format(dt.year, dt.month)
     return LOG_DIR + "/" + fname
@@ -34,6 +35,7 @@ def ensure_monthly_header(path):
             f.write(header)
             f.close
 
+# Append the record to the monthly csv
 def append_sample(record):
     """
     sample: dict with keys matching CSV header.

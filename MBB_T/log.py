@@ -18,7 +18,8 @@ def ensure_monthly_header(path):
 
     if size == 0:
         with open(path, "w") as f:
-            f.write("timestamp,water_temp_c,lat,lon,batt_v,seq\n")
+            f.write("timestamp,water_temp_c,lat,lon,altitude,satellites,hdop,batt_v,seq\n")
+            f.close
 
 def append_sample(sample):
     """
@@ -28,12 +29,12 @@ def append_sample(sample):
     ensure_monthly_header(path)
 
     # Build CSV line
-    line = "{ts},{wt:.2f},{mx:.3f},{my:.3f},{mz:.3f},{lat:.6f},{lon:.6f},{bv:.3f},{seq}\n".format(
+    line = "{ts},{wt:.2f},{sat:.3f},{altitude:.3f},{hdop:.3f},{lat:.6f},{lon:.6f},{bv:.3f},{seq}\n".format(
         ts=sample["timestamp"],
         wt=sample["water_temp_c"],
-        mx=sample["mag_x"],
-        my=sample["mag_y"],
-        mz=sample["mag_z"],
+        sat=sample["satellites"],
+        my=sample["altitude"],
+        hdop=sample["hdop"],
         lat=sample["lat"],
         lon=sample["lon"],
         bv=sample["batt_v"],
@@ -43,3 +44,5 @@ def append_sample(sample):
     with open(path, "a") as f:
         f.write(line)
         f.flush()
+        f.close
+        

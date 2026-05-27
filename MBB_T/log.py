@@ -4,6 +4,19 @@ import sd_storage
 
 LOG_DIR = "/sd/logs"
 
+header = [
+    "timestamp,"
+    "water_temp_c,"
+    "lat,"
+    "lon,"
+    "altitude,"
+    "satellites,"
+    "hdop,"
+    "batt_v,"
+    "internal_temp"
+    "seq"
+    ]
+
 def get_monthly_filename():
     dt = rtc.get_datetime()
     fname = "{:04d}-{:02d}.csv".format(dt.year, dt.month)
@@ -18,10 +31,10 @@ def ensure_monthly_header(path):
 
     if size == 0:
         with open(path, "w") as f:
-            f.write("timestamp,water_temp_c,lat,lon,altitude,satellites,hdop,batt_v,seq\n")
+            f.write(header)
             f.close
 
-def append_sample(sample):
+def append_sample(record):
     """
     sample: dict with keys matching CSV header.
     """
@@ -29,20 +42,16 @@ def append_sample(sample):
     ensure_monthly_header(path)
 
     # Build CSV line
-    line = "{ts},{wt:.2f},{sat:.3f},{altitude:.3f},{hdop:.3f},{lat:.6f},{lon:.6f},{bv:.3f},{seq}\n".format(
-        ts=sample["timestamp"],
-        wt=sample["water_temp_c"],
-        sat=sample["satellites"],
-        my=sample["altitude"],
-        hdop=sample["hdop"],
-        lat=sample["lat"],
-        lon=sample["lon"],
-        bv=sample["batt_v"],
-        seq=sample["seq"],
-    )
+    row = []
+    for key in header:
+        value = record.get(key, "")
+        row.append(str(value))
+
+    line = ",".join(row) + "\n"
 
     with open(path, "a") as f:
         f.write(line)
         f.flush()
-        f.close
+        
+    f.close
         

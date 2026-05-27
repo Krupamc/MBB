@@ -12,6 +12,11 @@ buoy_name = "MBB_OG"
 # How often the buoy colects data:
 alarm_interval = 1
 
+#---Operation Retries---
+#(e.g. Saving or Transmitting)
+num_of_attempts = 3
+retry_delay_ms = 500
+
 # ---GPIO---
 # General Input Output Pins Layout
 # ex: Module - Protocal/Pins reqiured

@@ -61,11 +61,6 @@ def build_record():
     gps_d, gps_d_err= read_gps()
     batt_v, batt_v_err = read_battery()
 
-    gps_lat = GPS.get_lat()
-    gps_lon = GPS.get_long()
-    gps_alt = GPS.get_alt()
-    gps_sats = GPS.get_sats()
-    gps_hdop = GPS.get_hdop()
     
 
     seq = log.what_is_next_sequence()
@@ -79,7 +74,7 @@ def build_record():
         "gps_sats": None,
         "gps_hdop": None,
         "internal_temp": in_temp,
-        "batt_v": None,      # replace later
+        "batt_v": batt_v,      # replace later
         "seq": seq,            # replace later
         "temp_error": temp_err,
         "gps_error": gps_d_err,
@@ -109,34 +104,47 @@ def save_record(record):
 
 def transmit_record(record):
     # Transmit to LoRa and write down missing packets to send later...
-    lora.transmit(record)
+    
     try:
-        log.save_sample(record)
+        lora.transmit(record)
         return True
     except Exception as e:
         print(f"[ERROR] Transmitting Error: {e}")
         return False
 
+# Retry a function
+def retry_operation(func, record, attempts=3, delay_ms=500, name="operation"):
+    for attempt in range(1, attempts + 1):
+        ok = func(record)
+        if ok:
+            return True
+
+        print(f"[ERROR] {name} attempt {attempt}/{attempts} failed")
+        if attempt < attempts:
+            time.sleep_ms(delay_ms)
+
+    return False
+
 def run_cycle():
     record = build_record()
     print("(1/3) Data collected...")
 
-    save_ok = save_record(record)
+    save_ok = retry_operation(save_record, record, attempts=cfg.num_of_attempts, delay_ms=cfg.retry_delay_ms, name="Saving")
 
-    if save_ok:
-        log.next_sequence()
-        print("(2/3) Data Saved...")
-        time.sleep_ms(500)
-
-        tx_ok = transmit_record(record)
-        if tx_ok:
-            print("(3/3) Data Sent!")
-        else:
-            print("[ERROR] Transmitting Error:")
-    
-    else:
+    if not save_ok:
         print("[ERROR] Data not Saved")
-    
+
+    log.next_sequence()
+    print("(2/3) Data Saved...")
+    time.sleep_ms(500)
+
+    tx_ok = retry_operation(transmit_record, record, attempts=cfg.num_of_attempts, delay_ms=cfg.retry_delay_ms, name="Transmitting")
+        
+    if tx_ok:
+        print("(3/3) Data Sent!")
+    else:
+        print("[ERROR] Data not transmitted; save for retry later")
+
     return record
 
 def main():

@@ -9,15 +9,20 @@ import config as cfg
 def read():
 
     # Water Temperature
-    temp_c = wtemp.watertmp()
+    try:
+        temp_c = wtemp.watertmp()
+    
+    except Exception as e: # Errors will be sent with the rest of the data; an error message starts with "*"
+        temp_c = "*" + str(e)
+        print(e)
 
-    if temp_c is None:
+    if isinstance(temp_c, str):
         print("No DS18B20 found")
     else:
         print("Water temp (C): {:.2f}".format(temp_c))
 
     # GPS
-    gps_d = GPS.get_gps()
+    gps_d = GPS.get_gps() # 
 
     # Battery Voltage
 

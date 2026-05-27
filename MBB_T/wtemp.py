@@ -1,6 +1,6 @@
 # Read from the DS18B20 water temp. probe
 
-import machine, onewire, ds18x20, time
+import machine, onewire, ds18x20, time, 
 import config as cfg
 
 ds_pin = machine.Pin(cfg.wtemp_gpio) # CHANGE THIS PIN
@@ -17,6 +17,7 @@ def watertmp():
     print(rom)
     tempC = ds_sensor.read_temp(rom)
     print('Water temperature (ºC):', "{:.2f}".format(tempC))
+    tempC = round(tempC, 2)
     #temp = "{:.2f}".format(tempC)
     return tempC
     # Add F variables in the Reciever

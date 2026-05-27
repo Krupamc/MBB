@@ -33,6 +33,9 @@ def get_gps():
             
     except Exception as e:
         print(f"An error occurred: {e}")
+        error = "*" + str(e)
+        return error
+    
 
 def get_time():
     try:

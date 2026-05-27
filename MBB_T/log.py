@@ -36,7 +36,7 @@ def ensure_monthly_header(path):
             f.close
 
 # Append the record to the monthly csv
-def append_sample(record):
+def save_sample(record):
     """
     sample: dict with keys matching CSV header.
     """

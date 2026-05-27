@@ -3,7 +3,9 @@
 import machine, time
 import wtemp # DS18B20 Water Probe
 import GPS # NEO-6M GPS
-import rtc #DS3231 RTC
+import rtc # DS3231 RTC
+import log # Microsd Card logging
+import lora_tx as lora # LoRa Tranmission
 import config as cfg
 
 def read_water_temp():
@@ -68,11 +70,11 @@ def build_record():
 
 def save_record(record):
     # Save to a microsd card
-    sd ="cool"
+    log.save_sample(record)
 
 def transmit_record(record):
     # Transmit to LoRa and write down missing packets to send later...
-    lora = "stupid"
+    lora.transmit(record)
 
 def run_cycle():
     record = build_record()

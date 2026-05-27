@@ -29,13 +29,13 @@ def init_lora():
     )
     return lora
 
-def main():
+def transmit(msg):
     lora = init_lora()
     print("LoRa TX ready (freq {} kHz)".format(cfg.lora_cfg["freq_khz"]))
 
     counter = 0
     while True:
-        msg = "buoy ping {}".format(counter)
+        msg = "buoy ping {}".format(counter) #also send the number of bits/items
         print("TX:", msg)
         lora.send(msg.encode("utf-8"))
         counter += 1

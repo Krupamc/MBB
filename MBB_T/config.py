@@ -6,6 +6,8 @@
     some changes will have to be made. 
     NOTE: This may include changing some sensor code and main.py depending on your setup
 """
+# Buoy Name
+buoy_name = "MBB_OG"
 
 # How often the buoy colects data:
 alarm_interval = 1

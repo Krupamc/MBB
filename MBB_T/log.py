@@ -2,7 +2,8 @@ import os
 import rtc   # your RTC helper, returning dt.year, dt.month...
 import sd_storage
 
-LOG_DIR = "/sd/logs"
+log_dir = "/sd/logs"
+seq_dir = "/sd/seq.txt"
 
 header = [ # All csv headers
     "timestamp,"
@@ -21,7 +22,7 @@ header = [ # All csv headers
 def get_monthly_filename(): 
     dt = rtc.get_datetime()
     fname = "{:04d}-{:02d}.csv".format(dt.year, dt.month)
-    return LOG_DIR + "/" + fname
+    return log_dir + "/" + fname
 
 def ensure_monthly_header(path):
     # If file doesn't exist or is empty, write a header row
@@ -56,4 +57,24 @@ def save_sample(record):
         f.flush()
         
     f.close
+
+def load_seq():
+    try:
+        with open(seq_dir, "r") as f:
+            return int(f.read().strip())
+    except:
+        return 0
+
+def save_seq(seq):
+    with open(seq_dir, "w") as f:
+        f.write(str(seq))
+
+def next_sequence():
+    seq = load_seq() + 1
+    save_seq(seq)
+    return seq
+
+def what_is_next_sequence():
+    seq = load_seq() + 1
+    return seq
         

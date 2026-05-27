@@ -65,7 +65,10 @@ def get_datetime():
 
 def get_temp_c():
     # Return DS3231 internal temperature (°C).
-    return rtc.get_temperature()
+    try:
+        return rtc.get_temperature(), None
+    except Exception as e:
+        return None, str(e)
 
 
 

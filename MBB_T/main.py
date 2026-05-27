@@ -14,55 +14,85 @@ def read_water_temp():
         temp_c = wtemp.watertmp()
     
     except Exception as e: # Errors will be sent with the rest of the data as a string; an error message starts with "*"
-        temp_c = "*" + str(e)
-        print(e)
+        print(f"[ERROR] Water Temp: {e}")
+        return None, str(e)
+        
 
     if isinstance(temp_c, str):
         print("No DS18B20 found")
     else:
         print("Water temp (C): {:.2f}".format(temp_c))
     
-    return temp_c
+    return temp_c, None
 
 def read_gps():
     # GPS
-    gps_d = GPS.get_gps() # Sends a error back as a string if there is one
-    return gps_d
+    try:
+        gps_d = GPS.get_gps() # Sends a error back as a string if there is one
+        return gps_d, None
+    
+    except Exception as e:
+        print(f"[ERROR] GPS: {e}")
+        return None, str(e)
 
 def read_time():
     # RTC - Real Time Clock
-    time_rtc = rtc.formatted_time()
-    return time_rtc
+    try:
+        time_rtc = rtc.formatted_time()
+        return time_rtc, None
+    except Exception as e:
+        print(f"[ERROR] RTC: {e}")
+        return None, str(e)
 
 def read_battery():
     # Battery Voltage
-    bat_v = "insert function"
-    return bat_v
+    try:
+        bat_v = "insert function"
+        return bat_v, None
+    except Exception as e:
+        print(f"[ERROR] Battery Voltage: {e}")
+        return None, str(e)
 
 def build_record():
     # Combine the data together
-    temp_c = read_water_temp()
-    timestamp = read_time()
-    in_temp = rtc.get_temp_c
+    temp_c, temp_err = read_water_temp()
+    timestamp, time_err = read_time()
+    in_temp, in_temp_err = rtc.get_temp_c()
+    gps_d, gps_d_err= read_gps()
+    batt_v, batt_v_err = read_battery()
+
     gps_lat = GPS.get_lat()
     gps_lon = GPS.get_long()
     gps_alt = GPS.get_alt()
     gps_sats = GPS.get_sats()
     gps_hdop = GPS.get_hdop()
-    gps_d = read_gps()
+    
+
+    seq = log.what_is_next_sequence()
 
     record = { # Directory of all data values to be saved and trasmitted
         "timestamp": timestamp,
         "water_temp_c": temp_c,
-        "gps_lat": gps_lat,
-        "gps_lon": gps_lon,
-        "gps_alt": gps_alt,
-        "gps_sats": gps_sats,
-        "gps_hdop": gps_hdop,
+        "gps_lat": None,
+        "gps_lon": None,
+        "gps_alt": None,
+        "gps_sats": None,
+        "gps_hdop": None,
         "internal_temp": in_temp,
         "batt_v": None,      # replace later
-        "seq": None,            # replace later
+        "seq": seq,            # replace later
+        "temp_error": temp_err,
+        "gps_error": gps_d_err,
+        "rtc_error": time_err,
+        "internal_temp_error": in_temp_err,
+        "batt_error": batt_v_err,
     }
+    if isinstance(gps_d, dict):
+            record["gps_lat"] = gps_d.get("lat")
+            record["gps_lon"] = gps_d.get("lon")
+            record["gps_alt"] = gps_d.get("alt")
+            record["gps_sats"] = gps_d.get("sats")
+            record["gps_hdop"] = gps_d.get("hdop")
 
     return record
     
@@ -70,29 +100,64 @@ def build_record():
 
 def save_record(record):
     # Save to a microsd card
-    log.save_sample(record)
+    try:
+        log.save_sample(record)
+        return True
+    except Exception as e:
+        print(f"[ERROR] Saving Error: {e}")
+        return False
 
 def transmit_record(record):
     # Transmit to LoRa and write down missing packets to send later...
     lora.transmit(record)
+    try:
+        log.save_sample(record)
+        return True
+    except Exception as e:
+        print(f"[ERROR] Transmitting Error: {e}")
+        return False
 
 def run_cycle():
     record = build_record()
-    save_record(record)
-    time.sleep_ms(500)
-    transmit_record(record)
+    print("(1/3) Data collected...")
+
+    save_ok = save_record(record)
+
+    if save_ok:
+        log.next_sequence()
+        print("(2/3) Data Saved...")
+        time.sleep_ms(500)
+
+        tx_ok = transmit_record(record)
+        if tx_ok:
+            print("(3/3) Data Sent!")
+        else:
+            print("[ERROR] Transmitting Error:")
+    
+    else:
+        print("[ERROR] Data not Saved")
+    
+    return record
 
 def main():
+    print(f"Buoy Powered on!\n")
+
+    #Alarm Reset/Set up
     rtc.sync_if_lost_power()
     rtc.clear_alarm()
     rtc.setup_alarm(cfg.alarm_interval) # CAHNGE TO 60 LATER in config
+    
+    seq = log.what_is_next_sequence()
+    print(f"Welcome to the {seq} sampling of the {cfg.buoy_name}!\nAll data will be collected, saved, and transmitted to the Reciever on the shore.\n")
     while True:
         record = run_cycle()
        
         time.sleep(10) # remove for deepsleep later
     record = run_cycle()
     
+    #
     #machine.deepsleep
+    
 
 if __name__ == "__main__":
     main()

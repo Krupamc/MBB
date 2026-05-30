@@ -1,0 +1,18 @@
+import machine, time
+import sd_storage as sd # Mounting the Microsd card
+import log # Microsd Card logging
+import lora_rx as lora # LoRa Tranmission
+import config as cfg
+
+def main():
+    print(f"Board Powered on!\n")
+    
+    # Mount and turn on LoRa/Microsd Card
+    mount = sd.mount_sd()
+    lora.init_lora()
+
+    seq = log.what_is_next_sequence()
+    print(f"Welcome to the {seq} sampling of the {cfg.buoy_name}!\nAll data will be collected, saved, and transmitted to the Reciever on the shore.\n")
+
+if __name__ == "__main__":
+    main()

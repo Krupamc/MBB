@@ -61,7 +61,7 @@ def save_sample(record):
         f.write(line)
         f.flush()
         
-    f.close
+    f.close()
 
 def load_seq():
     try:

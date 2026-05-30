@@ -5,11 +5,11 @@
 import network
 import time
 from machine import Pin
+import config as cfg
 
 #credentials
-ssid = "my-wifi"
-password = "password"
-
+ssid = cfg.ssid
+password = cfg.password
 
 led = Pin("LED", Pin.OUT) #led pin
 
@@ -22,21 +22,21 @@ def blink():
         led.value(0)
         time.sleep(0.5)
 
-#connect to wifi
+# Connect to wifi
 def connect():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     wlan.connect(ssid, password)
-    network.hostname("MTB Reciever")
+    network.hostname(cfg.hostname)
 
     time_start = time.ticks_ms() # IF wifi buffers for more than X seconds, restart wifi.
     while not wlan.isconnected:
-        if time.ticks_diff(time.ticks_ms(), time_start) > 30 * 1000: #if >30 secs
+        if time.ticks_diff(time.ticks_ms(), time_start) > cfg.buffer_time * 1000:
             break
         time.sleep_ms
     return wlan
 
-#Connections
+# Connections
 try:
     connect()
     for i in range (3):
@@ -45,11 +45,11 @@ try:
         led.value(0)
         time.sleep(0.25)
 
-except OSError as e: #if really bad error, blink forever
+except OSError as e: # If really bad error, blink forever
     blink()
     print("Wifi Error")
 
-#Sleep before program to give USBs more time to setup
+# Sleep before program to give USBs more time to setup
 try: 
     time.sleep_ms(200)
 

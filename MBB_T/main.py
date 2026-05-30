@@ -5,6 +5,7 @@ import wtemp # DS18B20 Water Probe
 import GPS # NEO-6M GPS
 import rtc # DS3231 RTC
 import log # Microsd Card logging
+import sd_storage as sd # Mounting Microsd Card
 import lora_tx as lora # LoRa Tranmission
 import config as cfg
 
@@ -126,18 +127,22 @@ def retry_operation(func, record, attempts=3, delay_ms=500, name="operation"):
     return False
 
 def run_cycle():
-    record = build_record()
+    record = build_record() # Collect Data
     print("(1/3) Data collected...")
+    mount = sd.mount_sd()
+    lora.init_lora()
+    time.sleep_ms(500)
 
+    # Check if data is saved; if not retry
     save_ok = retry_operation(save_record, record, attempts=cfg.num_of_attempts, delay_ms=cfg.retry_delay_ms, name="Saving")
 
     if not save_ok:
         print("[ERROR] Data not Saved")
-
     log.next_sequence()
     print("(2/3) Data Saved...")
     time.sleep_ms(500)
 
+    # Check if data is sent; if not retry
     tx_ok = retry_operation(transmit_record, record, attempts=cfg.num_of_attempts, delay_ms=cfg.retry_delay_ms, name="Transmitting")
         
     if tx_ok:

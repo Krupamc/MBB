@@ -1,6 +1,16 @@
-# Configuration of the MBB (My Buddy Buoy :D) Reciever:
+# Configuration of the MBB (My Buddy Buoy :D) Receiver:
 
-#LoRa
+#---WIFI---
+# (Pico will flash a LED infinitly if the wifi does not connect)
+ssid = "some-wifi..." # Name of the Wifi
+password = "1234" # I hope you know what this is...
+hostname = "My Buddy Buoy Receiver" # Name of the device on the WIFI network.
+buffer_time = 30 # How many seconds the pico will let wifi try to connect before trying again.
+
+# Buoy Name
+buoy_name = "MBB_Receiver" # How Buoy is refered to in the program.
+
+#---LoRa---
 
 lora_frq_khz = 915000  # 915 MHz for North America; use 868000 for EU
 

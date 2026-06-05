@@ -6,7 +6,7 @@ from time import sleep
 from lora import SX1262 #change lib folder to lora btw
 import config as cfg
 
-def init_lora():
+def init_lora(): # Initate with Settings from config
     spi = SPI(
         cfg.spi_id,
         baudrate=2_000_000,
@@ -29,8 +29,20 @@ def init_lora():
     )
     return lora
 
-def main():
-    lora = init_lora()
+# Take payload and return directory
+def parse_payload(payload):
+    data = {}
+
+    parts = payload.split(",")
+    for item in parts:
+        if "=" in item:
+            key, value = item.split("=", 1)
+            data[key.strip() = value.strip()]
+    
+    return data
+
+# Will loop infinitly waiting for data and print
+def debug_loop():
     print("LoRa RX ready (freq {} kHz)".format(cfg.lora_cfg["freq_khz"]))
 
     while True:
@@ -46,5 +58,41 @@ def main():
         else:
             sleep(0.1)
 
-if __name__ == "__main__":
-    main()
+# Checks for Payload once and return the record of data
+def recieve_once():
+    pkt = lora.recv()
+    if pkt is None:
+        return None
+    
+    try:
+        text = pkt["payload"].decode("uft-8")
+    except:
+        text = str(pkt["payload"])
+
+    data = parse_payload(text)
+
+    record = {
+        "rx_timestamp": 5, #CHANGE TI WIFI/LOCAL RTC TIME AFTER
+        "seq": data.get("seq"),
+        "timestamp": data.get("timestamp"),
+        "water_temp_c": data.get("water_temp_c"),
+        "gps_lat": data.get("gps_lat"),
+        "gps_long": data.get("gps_long"),
+        "gps_alt": data.get("gps_alt"),
+        "gps_sats": data.get("gps_sats"),
+        "gps_hdop": data.get("gps_hdop"),
+        "internal_temp": data.get("internal_temp"),
+        "batt_v": data.get("batt_v"),
+        "temp_error": data.get("temp_error"),
+        "gps_error": data.get("gps_error"),
+        "rtc_error": data.get("rtc_error"),
+        "internal_temp_error": data.get("internal_temp_error"),
+        "batt_error": data.get("batt_error"),
+        "rssi": pkt.get("rssi"),
+        "snr": pkt.get("snr"),
+        "raw_payload": text
+    }
+    
+    return record
+#if __name__ == "__main__":
+#    main()

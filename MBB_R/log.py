@@ -41,6 +41,9 @@ def ensure_monthly_header(path):
             f.write(header)
             f.close
 
+def missing_check():
+    if
+
 # Append the record to the monthly csv
 def save_sample(record):
     """

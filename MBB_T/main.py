@@ -166,6 +166,7 @@ def main():
         record = run_cycle()
        
         time.sleep(10) # remove for deepsleep later
+    #wait for incoming transmissions for mission styff
     record = run_cycle()
     
     #

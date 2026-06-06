@@ -3,9 +3,24 @@ import sd_storage as sd # Mounting the Microsd card
 import log # Microsd Card logging
 import lora_rx as lora # LoRa Tranmission
 import config as cfg
+import boot # Time Syncing and WIFI
+
+# Retry a function
+def retry_operation(func, record, attempts=3, delay_ms=500, name="operation"):
+    for attempt in range(1, attempts + 1):
+        ok = func(record)
+        if ok:
+            return True
+
+        print(f"[ERROR] {name} attempt {attempt}/{attempts} failed")
+        if attempt < attempts:
+            time.sleep_ms(delay_ms)
+
+    return False
 
 def main():
     print(f"Board Powered on!\n")
+
     
     # Mount and turn on LoRa/Microsd Card
     mount = sd.mount_sd()
@@ -20,9 +35,9 @@ def main():
 
         if record is not None:
             print("RX Record:", record)
+    
+            seq_status = log.check_sequence(record)
             log.save_sample(record)
-            log.missing_check()
-        
         time.sleep(0.1)
 
 

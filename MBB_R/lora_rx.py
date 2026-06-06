@@ -4,7 +4,9 @@
 from machine import Pin, SPI
 from time import sleep
 from lora import SX1262 #change lib folder to lora btw
-import config as cfg
+import config as cfg # Config
+import log # Get Time
+import boot
 
 def init_lora(): # Initate with Settings from config
     spi = SPI(
@@ -61,38 +63,43 @@ def debug_loop():
 # Checks for Payload once and return the record of data
 def recieve_once():
     pkt = lora.recv()
+
     if pkt is None:
         return None
     
-    try:
-        text = pkt["payload"].decode("uft-8")
-    except:
-        text = str(pkt["payload"])
+    else:
 
-    data = parse_payload(text)
+        try:
+            text = pkt["payload"].decode("uft-8")
+        except:
+            text = str(pkt["payload"])
 
-    record = {
-        "rx_timestamp": 5, #CHANGE TI WIFI/LOCAL RTC TIME AFTER
-        "seq": data.get("seq"),
-        "timestamp": data.get("timestamp"),
-        "water_temp_c": data.get("water_temp_c"),
-        "gps_lat": data.get("gps_lat"),
-        "gps_long": data.get("gps_long"),
-        "gps_alt": data.get("gps_alt"),
-        "gps_sats": data.get("gps_sats"),
-        "gps_hdop": data.get("gps_hdop"),
-        "internal_temp": data.get("internal_temp"),
-        "batt_v": data.get("batt_v"),
-        "temp_error": data.get("temp_error"),
-        "gps_error": data.get("gps_error"),
-        "rtc_error": data.get("rtc_error"),
-        "internal_temp_error": data.get("internal_temp_error"),
-        "batt_error": data.get("batt_error"),
-        "rssi": pkt.get("rssi"),
-        "snr": pkt.get("snr"),
-        "raw_payload": text
-    }
-    
-    return record
+        # Log the time
+        log.set_sample_time(boot.formatted_time())
+
+        data = parse_payload(text) # Get the decrypted text
+        record = {
+            "rx_timestamp": log.read_sample_time(),
+            "seq": data.get("seq"),
+            "timestamp": data.get("timestamp"),
+            "water_temp_c": data.get("water_temp_c"),
+            "gps_lat": data.get("gps_lat"),
+            "gps_long": data.get("gps_long"),
+            "gps_alt": data.get("gps_alt"),
+            "gps_sats": data.get("gps_sats"),
+            "gps_hdop": data.get("gps_hdop"),
+            "internal_temp": data.get("internal_temp"),
+            "batt_v": data.get("batt_v"),
+            "temp_error": data.get("temp_error"),
+            "gps_error": data.get("gps_error"),
+            "rtc_error": data.get("rtc_error"),
+            "internal_temp_error": data.get("internal_temp_error"),
+            "batt_error": data.get("batt_error"),
+            "rssi": pkt.get("rssi"),
+            "snr": pkt.get("snr"),
+            "raw_payload": text
+        }
+        
+        return record
 #if __name__ == "__main__":
 #    main()

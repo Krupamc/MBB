@@ -67,6 +67,7 @@ def build_record():
     seq = log.what_is_next_sequence()
 
     record = { # Directory of all data values to be saved and trasmitted
+        "seq": seq,
         "timestamp": timestamp,
         "water_temp_c": temp_c,
         "gps_lat": None,
@@ -75,8 +76,7 @@ def build_record():
         "gps_sats": None,
         "gps_hdop": None,
         "internal_temp": in_temp,
-        "batt_v": batt_v,      # replace later
-        "seq": seq,            # replace later
+        "batt_v": batt_v,        
         "temp_error": temp_err,
         "gps_error": gps_d_err,
         "rtc_error": time_err,

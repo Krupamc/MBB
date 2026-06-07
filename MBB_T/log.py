@@ -43,9 +43,7 @@ def ensure_monthly_header(path):
 
 # Append the record to the monthly csv
 def save_sample(record):
-    """
-    sample: dict with keys matching CSV header.
-    """
+
     path = get_monthly_filename()
     ensure_monthly_header(path)
 
@@ -62,6 +60,35 @@ def save_sample(record):
         f.flush()
         
     f.close()
+
+def read_sample(seq):
+
+    path = get_monthly_filename()
+    ensure_monthly_header(path)
+
+    try:
+        with open(path, "r") as f:
+            header_line = f.readline().strip()
+            if not header_line:
+                return None
+
+            headers = header_line.split(",")
+
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+
+                cols = line.split(",")
+
+                if cols[0] == str(seq):
+                    return dict(zip(headers, cols))
+
+    except OSError as e:
+        print("[ERROR] opening file:", e)
+
+    return None
+
 
 def load_seq():
     try:

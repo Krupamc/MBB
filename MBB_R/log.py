@@ -1,7 +1,7 @@
 import os
 
 import sd_storage
-import transmission as transmit
+import lora_tx as tx
 
 log_dir = "/sd/logs"
 seq_dir = "/sd/seq.txt"
@@ -173,7 +173,8 @@ def check_sequence(record):
     
     if missing:
         print(f"Found {len(missing)} missing packets")
-        transmit.make_missing_record(record, seq, last_seq)
+        tx.make_missing_record(record, seq, last_seq)
+
     
     return result
     

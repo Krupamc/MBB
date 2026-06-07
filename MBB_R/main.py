@@ -1,7 +1,8 @@
 import machine, time
 import sd_storage as sd # Mounting the Microsd card
 import log # Microsd Card logging
-import lora_rx as lora # LoRa Tranmission
+import lora_rx as lora # LoRa Receiving
+import lora_tx as tx # LoRa Transmitting
 import config as cfg
 import boot # Time Syncing and WIFI
 
@@ -35,8 +36,11 @@ def main():
 
         if record is not None:
             print("RX Record:", record)
-    
             seq_status = log.check_sequence(record)
+            missing = seq_status.get("missing_seqs")
+            if missing:
+                tx.ask_missing(seq_status["missing_seqs"])
+
             log.save_sample(record)
         time.sleep(0.1)
 

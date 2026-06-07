@@ -5,6 +5,7 @@ from machine import Pin, SPI
 from time import sleep
 from lora import SX1262 #change lib folder to lora btw
 import config as cfg
+import log
 
 def init_lora():
     spi = SPI(
@@ -29,17 +30,38 @@ def init_lora():
     )
     return lora
 
-def transmit(msg):
+def transmit_test(msg):
     lora = init_lora()
     print("LoRa TX ready (freq {} kHz)".format(cfg.lora_cfg["freq_khz"]))
 
     counter = 0
     while True:
+        #change to just be 1 time
         msg = "buoy ping {}".format(counter) #also send the number of bits/items
         print("TX:", msg)
         lora.send(msg.encode("utf-8"))
         counter += 1
         sleep(5)
 
+def transmit(msg, seq):
+    #lora = init_lora()
+    print("LoRa TX ready (freq {} kHz)".format(cfg.lora_cfg["freq_khz"]))
+    
+    #change to be just once
+    msg.format(seq) #also send the number of bits/items
+    print("TX:", msg)
+    lora.send(msg.encode("utf-8"))
+
+def resend_sequence(seq_needed):
+    print("LoRa TX ready for Resend (freq {} kHz)".format(cfg.lora_cfg["freq_khz"]))
+
+    msg = log.read_sample(seq_needed) # Read the data from the monthly csv
+    
+    msg = "buoy ping {}".format(seq_needed) #also send the number of bits/items
+    print("TX:", msg)
+    lora.send(msg.encode("utf-8"))
+
 #if __name__ == "__main__":
-    main()
+#    main()
+
+# WORKING ON T

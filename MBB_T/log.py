@@ -6,6 +6,7 @@ log_dir = "/sd/logs"
 seq_dir = "/sd/seq.txt"
 
 header = [ # All csv headers
+    "seq,"
     "timestamp,"
     "water_temp_c,"
     "gps_lat,"
@@ -15,7 +16,6 @@ header = [ # All csv headers
     "gps_hdop,"
     "internal_temp,"
     "batt_v,"
-    "seq,"
     "temp_error,"
     "gps_error,"
     "rtc_error,"
@@ -61,7 +61,7 @@ def save_sample(record):
         
     f.close()
 
-def read_sample(seq):
+def read_sample(seq): # Read a missing sample and return a dict
 
     path = get_monthly_filename()
     ensure_monthly_header(path)

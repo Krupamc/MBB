@@ -43,6 +43,7 @@ def main():
 
             log.save_sample(record)
         time.sleep(0.1)
+        time.slee
 
 
 

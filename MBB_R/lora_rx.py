@@ -32,6 +32,15 @@ def init_lora(): # Initate with Settings from config
     return lora
 
 # Take payload and return directory
+def handle_command(text):
+    if text.startswith("RESEND:"):
+        seq_needed = int(text.spit(":")[1])
+        tx.resend_sequence(seq_needed)
+        
+    
+    return data
+
+# Take payload and return directory
 def parse_payload(payload):
     data = {}
 
@@ -101,5 +110,50 @@ def recieve_once():
         }
         
         return record
+    
+
+# Checks for Payload once and return the record of data
+def recieve_missing_once():
+    pkt = lora.recv()
+
+    if pkt is None:
+        return None
+    
+    else:
+
+        try:
+            text = pkt["payload"].decode("uft-8")
+        except:
+            text = str(pkt["payload"])
+
+        # Log the time
+        receive_time =  log.set_sample_time(boot.formatted_time())
+
+        handle_command(text)
+        data = parse_payload(text) # Get the decrypted text
+
+        missing_record = {
+            "rx_timestamp": receive_time,
+            "seq": data.get("seq"),
+            "timestamp": data.get("timestamp"),
+            "water_temp_c": data.get("water_temp_c"),
+            "gps_lat": data.get("gps_lat"),
+            "gps_long": data.get("gps_long"),
+            "gps_alt": data.get("gps_alt"),
+            "gps_sats": data.get("gps_sats"),
+            "gps_hdop": data.get("gps_hdop"),
+            "internal_temp": data.get("internal_temp"),
+            "batt_v": data.get("batt_v"),
+            "temp_error": data.get("temp_error"),
+            "gps_error": data.get("gps_error"),
+            "rtc_error": data.get("rtc_error"),
+            "internal_temp_error": data.get("internal_temp_error"),
+            "batt_error": data.get("batt_error"),
+            "rssi": pkt.get("rssi"),
+            "snr": pkt.get("snr"),
+            "raw_payload": text
+        }
+        
+        return missing_record
 #if __name__ == "__main__":
 #    main()

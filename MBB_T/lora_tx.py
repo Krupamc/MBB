@@ -6,6 +6,7 @@ from time import sleep
 from lora import SX1262 #change lib folder to lora btw
 import config as cfg
 import log
+import json
 
 def init_lora():
     spi = SPI(
@@ -43,25 +44,47 @@ def transmit_test(msg):
         counter += 1
         sleep(5)
 
-def transmit(msg, seq):
+def transmit(record, seq):
     #lora = init_lora()
     print("LoRa TX ready (freq {} kHz)".format(cfg.lora_cfg["freq_khz"]))
     
-    #change to be just once
-    msg.format(seq) #also send the number of bits/items
+    packet = { # Take the record and put it inside a JSON dump
+        "type": "SEND",
+        "seq": seq,
+        "data": record
+    }
+ 
+    msg = json.dumps(packet)
+
     print("TX:", msg)
     lora.send(msg.encode("utf-8"))
 
 def resend_sequence(seq_needed):
     print("LoRa TX ready for Resend (freq {} kHz)".format(cfg.lora_cfg["freq_khz"]))
 
-    msg = log.read_sample(seq_needed) # Read the data from the monthly csv
+    sample = log.read_sample(seq_needed) # Read the data from the monthly csv
     
-    msg = "buoy ping {}".format(seq_needed) #also send the number of bits/items
+    if sample is None: # IF data is not found, make send JSON with error
+        packet = {
+            type: "RESEND",
+            "seq_requested": seq_needed,
+            "data": f"[ERROR seq {seq_needed} not found]"
+        }
+        
+    
+    else: # With data send JSON
+        packet = {
+        "type": "RESEND",
+        "seq_requested": seq_needed,
+        "data": sample
+    }
+    
+    msg = json.dumps(packet) # JSON
+
     print("TX:", msg)
     lora.send(msg.encode("utf-8"))
 
 #if __name__ == "__main__":
 #    main()
 
-# WORKING ON T
+# WORKING ON Resend by reading from csv

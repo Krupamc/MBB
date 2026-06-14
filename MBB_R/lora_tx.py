@@ -1,8 +1,9 @@
 from machine import Pin, SPI
-from time import sleep
+import time
 from lora import SX1262 #change lib folder to lora btw
 import config as cfg # Config
 import log # Saving to MicroSD
+import lora_rx as rx # Recieving functions
 
 def make_missing_record(record, seq, last_seq):
     missing_record = {
@@ -42,4 +43,6 @@ def ask_missing(missing_seqs):
     #MAKE THIS
     for i in missing_seqs:
         transmit_missing(missing_seqs[i])
-        sleep(5)
+        for ms
+        rx.recieve_missing_once
+        time.sleep_ms(1)

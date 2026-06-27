@@ -7,9 +7,21 @@ import config as cfg
 import boot # Time Syncing and WIFI
 
 # Retry a function
-def retry_operation(func, record, attempts=3, delay_ms=500, name="operation"):
+def retry_operation_record(func, record, attempts=cfg.num_of_attempts, delay_ms=cfg.retry_delay_ms, name="operation"):
     for attempt in range(1, attempts + 1):
         ok = func(record)
+        if ok:
+            return True
+
+        print(f"[ERROR] {name} attempt {attempt}/{attempts} failed")
+        if attempt < attempts:
+            time.sleep_ms(delay_ms)
+
+    return False
+
+def retry_operation(func, attempts=cfg.num_of_attempts, delay_ms=cfg.retry_delay_ms, name="operation"):
+    for attempt in range(1, attempts + 1):
+        ok = func()
         if ok:
             return True
 
@@ -23,8 +35,9 @@ def main():
     print(f"Board Powered on!\n")
 
     # Mount and turn on LoRa/Microsd Card
-    mount = sd.mount_sd()
-    lora_device = lora.init_lora()
+    mount = retry_operation(sd.mount_sd(), name="Mount MicroSD")
+    
+    lora_device = retry_operation(lora.init_lora(), name="LoRa Intialization")
     
     seq = log.what_is_next_sequence()
     print(f"Welcome to the {seq} sampling of the {cfg.buoy_name}!\nAll data will be collected, saved, and transmitted to the Reciever on the shore.\n")

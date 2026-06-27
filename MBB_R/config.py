@@ -12,6 +12,11 @@ utc_offset = -5 # This is for EST
 # Buoy Name:
 buoy_name = "MBB_Receiver" # How Buoy is refered to in the program.
 
+#---Operation Retries---
+#(e.g. Saving or Transmitting)
+num_of_attempts = 3
+retry_delay_ms = 500
+
 #---LoRa---
 
 lora_frq_khz = 915000  # 915 MHz for North America; use 868000 for EU

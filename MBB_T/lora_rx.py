@@ -1,4 +1,4 @@
-#Buoy transmitter with micropySX126X lib
+# MBB (My Buoy Buddy :D) transmitter with micropySX126X lib
 #https://github.com/ehong-tl/micropySX126X
 
 from machine import Pin, SPI

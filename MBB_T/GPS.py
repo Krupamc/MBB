@@ -1,3 +1,4 @@
+# GPS for the MBB (My Buoy Buddy :D)
 # Read from the NEO-6M GPS module
 # Complete project details at https://RandomNerdTutorials.com/raspberry-pi-pico-neo-6m-micropython/
 

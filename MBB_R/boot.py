@@ -1,5 +1,5 @@
 
-# MBB (My Buddy Buoy :D) reciever
+# MBB (My Buoy Buddy :D) reciever
 
 
 import network

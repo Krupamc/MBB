@@ -1,3 +1,5 @@
+# MBB (My Buoy Buddy :D) Reciever
+# Missing data
 from machine import Pin, SPI
 import time
 from lora import SX1262 #change lib folder to lora btw

@@ -1,4 +1,4 @@
-# Configuration of the MBB (My Buddy Buoy :D) Receiver:
+# Configuration of the MBB (My Buoy Buddy :D) Receiver:
 
 #---WIFI---
 # (Pico will flash a LED infinitly if the wifi does not connect)

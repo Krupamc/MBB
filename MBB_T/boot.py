@@ -1,5 +1,5 @@
 
-# MBB (My Buddy Buoy :D) Transmitter
+# MBB (My Buoy Buddy :D) Transmitter
 """There is not much to say here other than that the buoy turns on."""
 
 import time

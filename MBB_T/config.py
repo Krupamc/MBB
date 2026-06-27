@@ -1,4 +1,4 @@
-# Configuration of the MBB (My Buddy Buoy :D):
+# Configuration of the MBB (My Buoy Buddy :D):
 
 """ This is the config.py file of the MBB. 
     If you are building the buoy using the exact same parts and setup,

@@ -1,3 +1,4 @@
+# MBB (My Buoy Buddy :D) RTC
 # Read from the DS3231 Real-time clock module
 # Complete project details at https://RandomNerdTutorials.com/raspberry-pi-pico-ds3231-rtc-micropython/
 

@@ -161,7 +161,7 @@ def main():
     rtc.setup_alarm(cfg.alarm_interval) # CAHNGE TO 60 LATER in config
     
     seq = log.what_is_next_sequence()
-    print(f"Welcome to the {seq} sampling of the {cfg.buoy_name}!\nAll data will be collected, saved, and transmitted to the Reciever on the shore.\n")
+    print(f"Welcome to the {seq} sampling of the {cfg.buoy_name}!\nAll data will be collected, saved, and transmitted to the Receiver on the shore.\n")
     while True:
         record = run_cycle()
     

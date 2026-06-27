@@ -59,7 +59,7 @@ def debug_loop():
             sleep(0.1)
 
 # Checks for Payload once and return the record of data
-def recieve_once():
+def receive_once():
     pkt = lora.recv()
 
     if pkt is None:

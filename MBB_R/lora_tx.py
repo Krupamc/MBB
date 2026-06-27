@@ -1,4 +1,4 @@
-# MBB (My Buoy Buddy :D) Reciever
+# MBB (My Buoy Buddy :D) Receiver
 # Missing data
 from machine import Pin, SPI
 import time
@@ -25,7 +25,7 @@ def transmit_test(msg):
         #change to be just once
         msg = "buoy ping {}".format(counter) #also send the number of bits/items
         print("TX:", msg)
-        lora.send(msg.encode("utf-8"))
+        rx.lora.send(msg.encode("utf-8"))
         counter += 1
         time.sleep(5)
 
@@ -34,21 +34,23 @@ def transmit_missing(seq):
     print("LoRa TX ready (freq {} kHz)".format(cfg.lora_cfg["freq_khz"]))
 
     msg = f"REQ:{seq}" # Sends a REQ with the seq wanted
-    
-    msg.format(seq) #also send the number of bits/items
+
     print("TX:", msg)
-    lora.send(msg.encode("utf-8"))
+    rx.lora.send(msg.encode("utf-8"))
 
 
 
 def ask_missing(missing_seqs):
     #MAKE THIS
-    for i in missing_seqs:
-        transmit_missing(missing_seqs[i])
+    for seq in missing_seqs:
+        transmit_missing(seq)
 
         loop = True
         while loop:
-            if rx.recieve_once() is not None:
+            record = rx.receive_once()
+            if record is not None:
+                log.save_sample(record)
                 time.sleep_ms(1)
             else:
                 loop = False
+            

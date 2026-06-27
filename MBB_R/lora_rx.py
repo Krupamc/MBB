@@ -1,12 +1,10 @@
-# MBB (My Buoy Buddy :D) reciever with micropySX126X lib
+# MBB (My Buoy Buddy :D) receiver with micropySX126X lib
 #https://github.com/ehong-tl/micropySX126X
 
 from machine import Pin, SPI
 from time import sleep
 from lora import SX1262 #change lib folder to lora btw
 import config as cfg # Config
-import log # Get Time
-import lora_tx as tx
 import boot
 import json
 
@@ -51,6 +49,7 @@ def handle_command(text):
     
     if not isinstance(data, dict):
         print("[RX ERROR]: Packet Data is not a Dict.") 
+        return None
 
     result = {
         "packet_type": packet_type,
@@ -67,7 +66,7 @@ def build_record(parsed, pkt, raw_text):
     data = parsed["data"]
 
     record = {
-            "seq": data.get("seq"),
+            "seq": parsed.get("seq"),
             "rx_timestamp": boot.formatted_time(),
             "timestamp": data.get("timestamp"),
             "water_temp_c": data.get("water_temp_c"),
@@ -86,7 +85,7 @@ def build_record(parsed, pkt, raw_text):
             "rssi": pkt.get("rssi"),
             "snr": pkt.get("snr"),
             "packet_type": parsed.get("packet_type"),
-            "is_resend": data.get("is_resend"),
+            "is_resend": parsed.get("is_resend"),
             "raw_payload": raw_text
         }
     
@@ -111,7 +110,7 @@ def debug_loop():
             sleep(0.1)
 
 # Checks for Payload once and return the record of data
-def recieve_once():
+def receive_once():
     pkt = lora.recv()
 
     if pkt is None:

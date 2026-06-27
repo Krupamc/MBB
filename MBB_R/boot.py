@@ -1,5 +1,5 @@
 
-# MBB (My Buoy Buddy :D) reciever
+# MBB (My Buoy Buddy :D) receiver
 
 
 import network
@@ -31,7 +31,7 @@ def connect():
     network.hostname(cfg.hostname)
 
     time_start = time.ticks_ms() # IF wifi buffers for more than X seconds, restart wifi.
-    while not wlan.isconnected:
+    while not wlan.isconnected():
         if time.ticks_diff(time.ticks_ms(), time_start) > cfg.buffer_time * 1000:
             break
         time.sleep_ms(100)

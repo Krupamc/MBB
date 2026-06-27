@@ -1,4 +1,4 @@
-# MBB (My Buoy Buddy :D) Reciever
+# MBB (My Buoy Buddy :D) Receiver
 
 import machine, time
 import sd_storage as sd # Mounting the Microsd card
@@ -42,20 +42,25 @@ def main():
     lora_device = retry_operation(lora.init_lora, name="LoRa Intialization")
     
     seq = log.what_is_next_sequence()
-    print(f"Welcome to the {seq} sampling of the {cfg.buoy_name}!\nAll data will be collected, saved, and transmitted to the Reciever on the shore.\n")
+    print(f"Welcome to the {seq} sampling of the {cfg.buoy_name}!\nAll data will be collected, saved, and transmitted to the Receiver on the shore.\n")
     
     # Wait for packets
     while True:
-        record = lora.recieve_once()
+        record = lora.receive_once()
 
         if record is not None:
             print("RX Record:", record)
             seq_status = log.check_sequence(record)
-            missing = seq_status.get("missing_seqs")
-            if missing:
-                tx.ask_missing(seq_status["missing_seqs"])
+            
+            if seq_status["ok"]:
+                log.save_sample(record)
 
-            log.save_sample(record)
+            elif seq_status["duplicate"] or seq_status["old"]:
+                continue
+
+            elif seq_status["missing_seqs"]:
+                tx.ask_missing(seq_status["missing_seqs"]) #includes saving
+
         time.sleep(0.1)
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 # MBB (My Buoy Buddy :D) Water probe
 # Read from the DS18B20 water temp. probe
 
-import machine, onewire, ds18x20, time, 
+import machine, onewire, ds18x20, time
 import config as cfg
 
 ds_pin = machine.Pin(cfg.wtemp_gpio) # CHANGE THIS PIN
@@ -21,7 +21,7 @@ def watertmp():
     tempC = round(tempC, 2)
     #temp = "{:.2f}".format(tempC)
     return tempC
-    # Add F variables in the Reciever
+    # Add F variables in the Receiver
     """
     tempF = tempC * (9/5) +32
     print('temperature (ºF):', "{:.2f}".format(tempF))

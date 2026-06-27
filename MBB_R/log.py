@@ -4,6 +4,8 @@ import os
 import sd_storage 
 import lora_tx as tx
 import boot
+import time
+import config as cfg
 
 log_dir = "/sd/logs"
 seq_dir = "/sd/seq.txt"
@@ -37,13 +39,13 @@ missing_header = [
     "rx_timestamp",
     "expected_from",
     "expected_to",
-    "recieved_seq"
+    "received_seq"
 ]
 
 
 # Monthly csvs 
 def get_monthly_filename(): 
-    now = boot.formatted_time()
+    now = time.localtime(time.time() + cfg.utc_offset * 3600)
     year = now[0]
     month = now[1]
     fname = "{:04d}-{:02d}.csv".format(year, month)
@@ -64,7 +66,7 @@ def ensure_header(path, header_fields):
 # Append the record to the monthly csv
 def save_sample(record):
     path = get_monthly_filename()
-    sd_storage.ensure_dir("sd/logs")
+    sd_storage.ensure_dir("/sd/logs")
     ensure_header(path, header)
 
     # Build CSV line
@@ -84,12 +86,12 @@ def save_sample(record):
 def save_missing(missing_record):
 
     path = "/sd/logs/missing_records.csv"
-    sd_storage.ensure_dir("sd/logs")
+    sd_storage.ensure_dir("/sd/logs")
     ensure_header(path, missing_header)
 
     # Build CSV line
     row = []
-    for key in header:
+    for key in missing_header:
         row.append(str(missing_record.get(key, "")))
 
     line = ",".join(row) + "\n"
@@ -136,15 +138,15 @@ def check_sequence(record):
         "missing_seqs": []
     }
 
-    if seq == 0: # First time
+    if last_seq == 0: # First time
         print("[FIRST BOOT]: Welcome to the First Sequence!!!")
         result["first_time"] = True
-        next_sequence()
+        save_seq(seq)
 
     elif seq == last_seq + 1: #No Errors
         print(f"[SEQ]: Sequence is {seq}")
         result["ok"] = True
-        next_sequence()
+        save_seq(seq)
     
     elif seq == last_seq: # Duplicate
         print("[SEQ Warning]: Received Duplicatet; Ignored")

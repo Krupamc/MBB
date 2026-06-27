@@ -6,6 +6,7 @@ from time import sleep
 from lora import SX1262 #change lib folder to lora btw
 import config as cfg # Config
 import log # Get Time
+import lora_tx as tx
 import boot
 
 def init_lora(): # Initate with Settings from config
@@ -21,24 +22,26 @@ def init_lora(): # Initate with Settings from config
         miso=Pin(cfg.pin_miso),
         )
     
+    global lora
+
     lora = SX1262(
-        spi=SPI,
+        spi=spi,
         cs=Pin(cfg.pin_cs, Pin.OUT),
         irq=Pin(cfg.pin_dio1, Pin.IN),
         rst=Pin(cfg.pin_rst, Pin.OUT),
         busy=Pin(cfg.pin_busy, Pin.IN) if cfg.pin_busy is not None else None,
         lora_cfg=cfg.lora_cfg,
     )
+    
     return lora
 
 # Take payload and return directory
 def handle_command(text):
     if text.startswith("RESEND:"):
-        seq_needed = int(text.spit(":")[1])
-        tx.resend_sequence(seq_needed)
+        pass
         
     
-    return data
+    #return data
 
 # Take payload and return directory
 def parse_payload(payload):
@@ -48,7 +51,7 @@ def parse_payload(payload):
     for item in parts:
         if "=" in item:
             key, value = item.split("=", 1)
-            data[key.strip() = value.strip()]
+            data[key.strip()] = value.strip()
     
     return data
 
@@ -60,7 +63,7 @@ def debug_loop():
         pkt = lora.recv()
         if pkt is not None:
             try:
-                text = pkt["payload"].decode("utf-8")
+                text = pkt["payload"].decode("uft-8")
             except Exception:
                 text = str(pkt["payload"])
             rssi = pkt.get("rssi", None)
@@ -79,16 +82,13 @@ def recieve_once():
     else:
 
         try:
-            text = pkt["payload"].decode("uft-8")
+            text = pkt["payload"].decode("uff-8")
         except:
             text = str(pkt["payload"])
 
-        # Log the time
-        log.set_sample_time(boot.formatted_time())
-
         data = parse_payload(text) # Get the decrypted text
         record = {
-            "rx_timestamp": log.read_sample_time(),
+            "rx_timestamp": boot.formatted_time(),
             "seq": data.get("seq"),
             "timestamp": data.get("timestamp"),
             "water_temp_c": data.get("water_temp_c"),
@@ -126,14 +126,11 @@ def recieve_missing_once():
         except:
             text = str(pkt["payload"])
 
-        # Log the time
-        receive_time =  log.set_sample_time(boot.formatted_time())
 
-        handle_command(text)
         data = parse_payload(text) # Get the decrypted text
 
         missing_record = {
-            "rx_timestamp": receive_time,
+            "rx_timestamp": boot.formatted_time(),
             "seq": data.get("seq"),
             "timestamp": data.get("timestamp"),
             "water_temp_c": data.get("water_temp_c"),

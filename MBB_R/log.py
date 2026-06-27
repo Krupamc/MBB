@@ -2,6 +2,7 @@ import os
 
 import sd_storage
 import lora_tx as tx
+import boot
 
 log_dir = "/sd/logs"
 seq_dir = "/sd/seq.txt"
@@ -29,27 +30,10 @@ header = [ # All csv headers
     "raw_payload,"
     ]
 
-# Set SAMPLE Time
-def set_sample_time(formatted_time):
-
-    try:
-        with open(time_dir, "r") as f:
-            global sample_time
-            sample_time = f.read().strip()
-            return sample_time
-    except:
-        return 0
-
-def read_sample_time():
-    try:
-        with open(time_dir, "r") as f:
-            return int(f.read().strip())
-    except:
-        return 0 
 
 # Monthly csvs 
 def get_monthly_filename(): 
-    dt = sample_time
+    dt = boot.formatted_time()
     year = dt[0]
     month = dt[1]
     fname = "{:04d}-{:02d}.csv".format(year, month)
@@ -78,8 +62,9 @@ def save_sample(record):
     for key in header:
         value = record.get(key, "")
         row.append(str(value))
-
-    line = ",".join(row) + "\n"
+    
+    line = row
+    #line = ",".join(row) + "\n"
 
     with open(path, "a") as f:
         f.write(line)
@@ -148,7 +133,7 @@ def check_sequence(record):
         result["ok"] = True
         next_sequence()
     
-    elif seq == last_seq: # First time
+    elif seq == 0: # First time
         print("[FIRST BOOT]: Welcome to the First Sequence!!!")
         result["first_time"] = True
         next_sequence()
@@ -162,8 +147,8 @@ def check_sequence(record):
         result["old"] = True
         
     
-    elif seq == last_seq + 2: # Missing the Last packet
-        print("[SEQ ERROR]: Missing Packet(s); Asking for Last Packet")
+    elif seq > last_seq + 1: # Missing packets
+        print("[SEQ ERROR]: Missing Packet(s); Asking for Packet(s)")
         result["missing_seqs"] = list(range(last_seq + 1, seq))
     
     else: # Will sort at server

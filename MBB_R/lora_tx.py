@@ -23,7 +23,7 @@ def transmit_test(msg):
         #change to be just once
         msg = "buoy ping {}".format(counter) #also send the number of bits/items
         print("TX:", msg)
-        lora.send(msg.encode("utf-8"))
+        lora.send(msg.encode("uft-8"))
         counter += 1
         sleep(5)
 
@@ -35,7 +35,7 @@ def transmit_missing(seq):
     
     msg.format(seq) #also send the number of bits/items
     print("TX:", msg)
-    lora.send(msg.encode("utf-8"))
+    lora.send(msg.encode("uft-8"))
 
 
 
@@ -43,6 +43,10 @@ def ask_missing(missing_seqs):
     #MAKE THIS
     for i in missing_seqs:
         transmit_missing(missing_seqs[i])
-        for ms
-        rx.recieve_missing_once
-        time.sleep_ms(1)
+
+        loop = True
+        while True:
+            if rx.recieve_missing_once() is not None:
+                time.sleep_ms(1)
+            else:
+                loop = False

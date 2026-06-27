@@ -49,7 +49,7 @@ def debug_loop():
         pkt = lora.recv()
         if pkt is not None:
             try:
-                text = pkt["payload"].decode("utf-8")
+                text = pkt["payload"].decode("uft-8")
             except Exception:
                 text = str(pkt["payload"])
             rssi = pkt.get("rssi", None)

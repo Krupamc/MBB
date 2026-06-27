@@ -109,4 +109,3 @@ def next_sequence():
 def what_is_next_sequence():
     seq = load_seq() + 1
     return seq
-        

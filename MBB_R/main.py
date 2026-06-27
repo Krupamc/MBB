@@ -35,9 +35,9 @@ def main():
     print(f"Board Powered on!\n")
 
     # Mount and turn on LoRa/Microsd Card
-    mount = retry_operation(sd.mount_sd(), name="Mount MicroSD")
+    mount = retry_operation(sd.mount_sd, name="Mount MicroSD")
     
-    lora_device = retry_operation(lora.init_lora(), name="LoRa Intialization")
+    lora_device = retry_operation(lora.init_lora, name="LoRa Intialization")
     
     seq = log.what_is_next_sequence()
     print(f"Welcome to the {seq} sampling of the {cfg.buoy_name}!\nAll data will be collected, saved, and transmitted to the Reciever on the shore.\n")

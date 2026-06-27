@@ -123,7 +123,7 @@ def retry_operation(func, record, attempts=3, delay_ms=500, name="operation"):
         print(f"[ERROR] {name} attempt {attempt}/{attempts} failed")
         if attempt < attempts:
             time.sleep_ms(delay_ms)
-
+            
     return False
 
 def run_cycle():
@@ -164,12 +164,10 @@ def main():
     print(f"Welcome to the {seq} sampling of the {cfg.buoy_name}!\nAll data will be collected, saved, and transmitted to the Reciever on the shore.\n")
     while True:
         record = run_cycle()
-       
+    
         time.sleep(10) # remove for deepsleep later
     #wait for incoming transmissions for mission styff
     record = run_cycle()
-    
-    #
     #machine.deepsleep
     
 

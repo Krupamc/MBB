@@ -22,7 +22,6 @@ def retry_operation(func, record, attempts=3, delay_ms=500, name="operation"):
 def main():
     print(f"Board Powered on!\n")
 
-    
     # Mount and turn on LoRa/Microsd Card
     mount = sd.mount_sd()
     lora_device = lora.init_lora()
@@ -43,9 +42,6 @@ def main():
 
             log.save_sample(record)
         time.sleep(0.1)
-        time.slee
-
-
 
 if __name__ == "__main__":
     main()

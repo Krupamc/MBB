@@ -138,7 +138,7 @@ def sync_if_lost_power():
             rtc.datetime(initial_time)  # Sync the RTC
 
         print("RTC initialized. Setting up the periodic alarm...")
-        setup_alarm()
+        setup_alarm(cfg.alarm_interval)
 
     except KeyboardInterrupt:
         print("Exiting program.")

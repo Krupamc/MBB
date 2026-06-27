@@ -71,7 +71,6 @@ def resend_sequence(seq_needed):
             "data": f"[ERROR seq {seq_needed} not found]"
         }
         
-    
     else: # With data send JSON
         packet = {
         "type": "RESEND",

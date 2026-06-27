@@ -10,7 +10,7 @@ header = [ # All csv headers
     "timestamp,"
     "water_temp_c,"
     "gps_lat,"
-    "gps_lon,"
+    "gps_long,"
     "gps_alt,"
     "gps_sats,"
     "gps_hdop,"

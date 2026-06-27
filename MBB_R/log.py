@@ -1,6 +1,6 @@
 import os
 
-import sd_storage
+import sd_storage 
 import lora_tx as tx
 import boot
 
@@ -9,37 +9,46 @@ seq_dir = "/sd/seq.txt"
 time_dir = "/sd/time.txt"
 
 header = [ # All csv headers
-    "rx_timestamp,"
-    "timestamp,"
-    "water_temp_c,"
-    "gps_lat,"
-    "gps_lon,"
-    "gps_alt,"
-    "gps_sats,"
-    "gps_hdop,"
-    "internal_temp,"
-    "batt_v,"
-    "seq,"
-    "temp_error,"
-    "gps_error,"
-    "rtc_error,"
-    "internal_temp_error,"
-    "batt_error,"
-    "rssi,"
-    "snr,"
-    "raw_payload,"
+    "rx_timestamp",
+    "timestamp",
+    "water_temp_c",
+    "gps_lat",
+    "gps_long",
+    "gps_alt",
+    "gps_sats",
+    "gps_hdop",
+    "internal_temp",
+    "batt_v",
+    "seq",
+    "temp_error",
+    "gps_error",
+    "rtc_error",
+    "internal_temp_error",
+    "batt_error",
+    "rssi",
+    "snr",
+    "raw_payload",
+    "packet_type",
+    "is_resend",
     ]
+
+missing_header = [
+    "rx_timestamp",
+    "expected_from",
+    "expected_to",
+    "recieved_seq"
+]
 
 
 # Monthly csvs 
 def get_monthly_filename(): 
-    dt = boot.formatted_time()
-    year = dt[0]
-    month = dt[1]
+    now = boot.formatted_time()
+    year = now[0]
+    month = now[1]
     fname = "{:04d}-{:02d}.csv".format(year, month)
     return log_dir + "/" + fname
 
-def ensure_header(path):
+def ensure_header(path, header_fields):
     # If file doesn't exist or is empty, write a header row
     try:
         size = os.stat(path)[6]
@@ -48,23 +57,21 @@ def ensure_header(path):
 
     if size == 0:
         with open(path, "w") as f:
-            f.write(header)
+            f.write(",".join(header_fields) + "\n")
             f.close
 
 # Append the record to the monthly csv
 def save_sample(record):
-    
     path = get_monthly_filename()
-    ensure_header(path)
+    sd_storage.ensure_dir("sd/logs")
+    ensure_header(path, header)
 
     # Build CSV line
     row = []
     for key in header:
-        value = record.get(key, "")
-        row.append(str(value))
-    
-    line = row
-    #line = ",".join(row) + "\n"
+        row.append(str(record.get(key, "")))
+        
+    line = ",".join(row) + "\n"
 
     with open(path, "a") as f:
         f.write(line)
@@ -76,13 +83,13 @@ def save_sample(record):
 def save_missing(missing_record):
 
     path = "/sd/logs/missing_records.csv"
-    ensure_header(path)
+    sd_storage.ensure_dir("sd/logs")
+    ensure_header(path, missing_header)
 
     # Build CSV line
     row = []
     for key in header:
-        value = missing_record.get(key, "")
-        row.append(str(value))
+        row.append(str(missing_record.get(key, "")))
 
     line = ",".join(row) + "\n"
 
@@ -128,18 +135,18 @@ def check_sequence(record):
         "missing_seqs": []
     }
 
-    if seq == last_seq + 1: #No Errors
+    if seq == 0: # First time
+        print("[FIRST BOOT]: Welcome to the First Sequence!!!")
+        result["first_time"] = True
+        next_sequence()
+
+    elif seq == last_seq + 1: #No Errors
         print(f"[SEQ]: Sequence is {seq}")
         result["ok"] = True
         next_sequence()
     
-    elif seq == 0: # First time
-        print("[FIRST BOOT]: Welcome to the First Sequence!!!")
-        result["first_time"] = True
-        next_sequence()
-    
     elif seq == last_seq: # Duplicate
-        print("[SEQ Warning]: Received the Same Packet; Ignored")
+        print("[SEQ Warning]: Received Duplicatet; Ignored")
         result["duplicate"] = True
     
     elif seq < last_seq: # Old Packet
@@ -152,7 +159,7 @@ def check_sequence(record):
         result["missing_seqs"] = list(range(last_seq + 1, seq))
     
     else: # Will sort at server
-        print("[SEQ Warning]: Out of Order; Saving regardless")
+        print("[SEQ Warning]: Out of Order")
 
     missing = result.get("missing_seqs")
     

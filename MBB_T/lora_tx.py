@@ -24,7 +24,7 @@ def init_lora():
     global lora
 
     lora = SX1262(
-        spi=SPI,
+        spi=spi,
         cs=Pin(cfg.pin_cs, Pin.OUT),
         irq=Pin(cfg.pin_dio1, Pin.IN),
         rst=Pin(cfg.pin_rst, Pin.OUT),
@@ -42,7 +42,7 @@ def transmit_test(msg):
         #change to just be 1 time
         msg = "buoy ping {}".format(counter) #also send the number of bits/items
         print("TX:", msg)
-        lora.send(msg.encode("uft-8"))
+        lora.send(msg.encode("utf-8"))
         counter += 1
         sleep(5)
 
@@ -59,7 +59,7 @@ def transmit(record, seq):
     msg = json.dumps(packet)
 
     print("TX:", msg)
-    lora.send(msg.encode("uft-8"))
+    lora.send(msg.encode("utf-8"))
 
 def resend_sequence(seq_needed):
     print("LoRa TX ready for Resend (freq {} kHz)".format(cfg.lora_cfg["freq_khz"]))
@@ -83,7 +83,7 @@ def resend_sequence(seq_needed):
     msg = json.dumps(packet) # JSON
 
     print("TX:", msg)
-    lora.send(msg.encode("uft-8"))
+    lora.send(msg.encode("utf-8"))
 
 #if __name__ == "__main__":
 #    main()

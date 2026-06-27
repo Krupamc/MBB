@@ -23,7 +23,7 @@ def init_lora(): # Initate with Settings from config
         )
     
     lora = SX1262(
-        spi=SPI,
+        spi=spi,
         cs=Pin(cfg.pin_cs, Pin.OUT),
         irq=Pin(cfg.pin_dio1, Pin.IN),
         rst=Pin(cfg.pin_rst, Pin.OUT),
@@ -49,7 +49,7 @@ def debug_loop():
         pkt = lora.recv()
         if pkt is not None:
             try:
-                text = pkt["payload"].decode("uft-8")
+                text = pkt["payload"].decode("utf-8")
             except Exception:
                 text = str(pkt["payload"])
             rssi = pkt.get("rssi", None)
@@ -68,7 +68,7 @@ def recieve_once():
     else:
 
         try:
-            text = pkt["payload"].decode("uft-8")
+            text = pkt["payload"].decode("utf-8")
         except:
             text = str(pkt["payload"])
 

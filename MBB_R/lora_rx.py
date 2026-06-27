@@ -8,6 +8,7 @@ import config as cfg # Config
 import log # Get Time
 import lora_tx as tx
 import boot
+import json
 
 def init_lora(): # Initate with Settings from config
     spi = SPI(
@@ -37,23 +38,60 @@ def init_lora(): # Initate with Settings from config
 
 # Take payload and return directory
 def handle_command(text):
-    if text.startswith("RESEND:"):
-        pass
-        
     
-    #return data
-
-# Take payload and return directory
-def parse_payload(payload):
-    data = {}
-
-    parts = payload.split(",")
-    for item in parts:
-        if "=" in item:
-            key, value = item.split("=", 1)
-            data[key.strip()] = value.strip()
+    try:
+        packet = json.loads(text)
     
-    return data
+    except Exception as e:
+        print("[RX ERROR]: Malformed/Invalid JSON:", e)
+        return None
+    
+    packet_type = packet.get("type")
+    data = packet.get("data", {})
+    
+    if not isinstance(data, dict):
+        print("[RX ERROR]: Packet Data is not a Dict.") 
+
+    result = {
+        "packet_type": packet_type,
+        "is_resend": (packet_type == "RESEND"),
+        "seq": packet.get("seq", data.get("seq")),
+        "seq_requested": packet.get("seq_requested"),
+        "data": data
+    }
+
+    return result
+
+def build_record(parsed, pkt, raw_text):
+    
+    data = parsed["data"]
+
+    record = {
+            "seq": data.get("seq"),
+            "rx_timestamp": boot.formatted_time(),
+            "timestamp": data.get("timestamp"),
+            "water_temp_c": data.get("water_temp_c"),
+            "gps_lat": data.get("gps_lat"),
+            "gps_long": data.get("gps_long"),
+            "gps_alt": data.get("gps_alt"),
+            "gps_sats": data.get("gps_sats"),
+            "gps_hdop": data.get("gps_hdop"),
+            "internal_temp": data.get("internal_temp"),
+            "batt_v": data.get("batt_v"),
+            "temp_error": data.get("temp_error"),
+            "gps_error": data.get("gps_error"),
+            "rtc_error": data.get("rtc_error"),
+            "internal_temp_error": data.get("internal_temp_error"),
+            "batt_error": data.get("batt_error"),
+            "rssi": pkt.get("rssi"),
+            "snr": pkt.get("snr"),
+            "packet_type": parsed.get("packet_type"),
+            "is_resend": data.get("is_resend"),
+            "raw_payload": raw_text
+        }
+    
+    return record
+
 
 # Will loop infinitly waiting for data and print
 def debug_loop():
@@ -63,7 +101,7 @@ def debug_loop():
         pkt = lora.recv()
         if pkt is not None:
             try:
-                text = pkt["payload"].decode("uft-8")
+                text = pkt["payload"].decode("utf-8")
             except Exception:
                 text = str(pkt["payload"])
             rssi = pkt.get("rssi", None)
@@ -82,75 +120,16 @@ def recieve_once():
     else:
 
         try:
-            text = pkt["payload"].decode("uff-8")
+            text = pkt["payload"].decode("utf-8")
         except:
             text = str(pkt["payload"])
 
-        data = parse_payload(text) # Get the decrypted text
-        record = {
-            "rx_timestamp": boot.formatted_time(),
-            "seq": data.get("seq"),
-            "timestamp": data.get("timestamp"),
-            "water_temp_c": data.get("water_temp_c"),
-            "gps_lat": data.get("gps_lat"),
-            "gps_long": data.get("gps_long"),
-            "gps_alt": data.get("gps_alt"),
-            "gps_sats": data.get("gps_sats"),
-            "gps_hdop": data.get("gps_hdop"),
-            "internal_temp": data.get("internal_temp"),
-            "batt_v": data.get("batt_v"),
-            "temp_error": data.get("temp_error"),
-            "gps_error": data.get("gps_error"),
-            "rtc_error": data.get("rtc_error"),
-            "internal_temp_error": data.get("internal_temp_error"),
-            "batt_error": data.get("batt_error"),
-            "rssi": pkt.get("rssi"),
-            "snr": pkt.get("snr"),
-            "raw_payload": text
-        }
+        # Open JSON
+        parsed = handle_command(text)
+        if parsed is None:
+            return None
         
-        return record
+    return build_record(parsed, pkt, text   )
     
-
-# Checks for Payload once and return the record of data
-def recieve_missing_once():
-    pkt = lora.recv()
-
-    if pkt is None:
-        return None
-    
-    else:
-
-        try:
-            text = pkt["payload"].decode("uft-8")
-        except:
-            text = str(pkt["payload"])
-
-
-        data = parse_payload(text) # Get the decrypted text
-
-        missing_record = {
-            "rx_timestamp": boot.formatted_time(),
-            "seq": data.get("seq"),
-            "timestamp": data.get("timestamp"),
-            "water_temp_c": data.get("water_temp_c"),
-            "gps_lat": data.get("gps_lat"),
-            "gps_long": data.get("gps_long"),
-            "gps_alt": data.get("gps_alt"),
-            "gps_sats": data.get("gps_sats"),
-            "gps_hdop": data.get("gps_hdop"),
-            "internal_temp": data.get("internal_temp"),
-            "batt_v": data.get("batt_v"),
-            "temp_error": data.get("temp_error"),
-            "gps_error": data.get("gps_error"),
-            "rtc_error": data.get("rtc_error"),
-            "internal_temp_error": data.get("internal_temp_error"),
-            "batt_error": data.get("batt_error"),
-            "rssi": pkt.get("rssi"),
-            "snr": pkt.get("snr"),
-            "raw_payload": text
-        }
-        
-        return missing_record
 #if __name__ == "__main__":
 #    main()

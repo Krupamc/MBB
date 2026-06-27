@@ -17,6 +17,13 @@ buoy_name = "MBB_Receiver" # How Buoy is refered to in the program.
 num_of_attempts = 3
 retry_delay_ms = 500
 
+# Micro SD Card - SPI
+sd_spi_id = 0        # or 0
+sd_sck   = 18        # example
+sd_mosi  = 19
+sd_miso  = 16
+sd_cs    = 17        # chip select
+
 #---LoRa---
 
 lora_frq_khz = 915000  # 915 MHz for North America; use 868000 for EU

@@ -71,7 +71,7 @@ def build_record():
         "timestamp": timestamp,
         "water_temp_c": temp_c,
         "gps_lat": None,
-        "gps_lon": None,
+        "gps_long": None,
         "gps_alt": None,
         "gps_sats": None,
         "gps_hdop": None,
@@ -85,7 +85,7 @@ def build_record():
     }
     if isinstance(gps_d, dict):
             record["gps_lat"] = gps_d.get("lat")
-            record["gps_lon"] = gps_d.get("lon")
+            record["gps_long"] = gps_d.get("lon")
             record["gps_alt"] = gps_d.get("alt")
             record["gps_sats"] = gps_d.get("sats")
             record["gps_hdop"] = gps_d.get("hdop")

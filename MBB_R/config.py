@@ -12,6 +12,11 @@ utc_offset = -5 # This is for EST
 # Buoy Name:
 buoy_name = "MBB_Receiver" # How Buoy is refered to in the program.
 
+#--API--
+API_URL = "http://192.168.1.4/ingest"
+API_KEY = "smth"
+
+
 #---Operation Retries---
 #(e.g. Saving or Transmitting)
 num_of_attempts = 3

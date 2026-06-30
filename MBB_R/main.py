@@ -6,6 +6,7 @@ import log # Microsd Card logging
 import lora_rx as lora # LoRa Receiving
 import lora_tx as tx # LoRa Transmitting
 import config as cfg
+import http_post as post # Send data to Server API
 import boot # Time Syncing and WIFI
 
 # Retry a function
@@ -61,6 +62,7 @@ def main():
             elif seq_status["missing_seqs"]:
                 tx.ask_missing(seq_status["missing_seqs"]) #includes saving
 
+        post.send_packet(record)
         time.sleep(0.1)
 
 if __name__ == "__main__":

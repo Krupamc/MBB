@@ -3,7 +3,6 @@ import os
 
 import sd_storage 
 import lora_tx as tx
-import boot
 import time
 import config as cfg
 
@@ -12,6 +11,7 @@ seq_dir = "/sd/seq.txt"
 time_dir = "/sd/time.txt"
 
 header = [ # All csv headers
+    "seq",
     "rx_timestamp",
     "timestamp",
     "water_temp_c",
@@ -22,7 +22,6 @@ header = [ # All csv headers
     "gps_hdop",
     "internal_temp",
     "batt_v",
-    "seq",
     "temp_error",
     "gps_error",
     "rtc_error",

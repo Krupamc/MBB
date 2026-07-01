@@ -36,11 +36,18 @@ def read_gps():
         print(f"[ERROR] GPS: {e}")
         return None, str(e)
 
+def get_timestamp():
+    dt = rtc.get_datetime()
+    return (
+        f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d}"
+        f"T{dt.hour:02d}:{dt.minute:02d}:{dt.second:02d}Z"
+    )
+
 def read_time():
     # RTC - Real Time Clock
     try:
-        time_rtc = rtc.formatted_time()
-        return time_rtc, None
+        dt = get_timestamp()
+        return dt, None
     except Exception as e:
         print(f"[ERROR] RTC: {e}")
         return None, str(e)

@@ -52,14 +52,9 @@ def sync_wifi_time():
         print("Error syncing time:", e)
 
 def formatted_time():
-    now = time.localtime(time.time() + cfg.utc_offset * 3600)
+    year, month, day, hour, minute, second, _, _ = time.gmtime()
+    return f"{year:04d}-{month:02d}-{day:02d}T{hour:02d}:{minute:02d}:{second:02d}Z"
 
-    formatted_datetime = (
-        f"{days_of_week[now[6]]}, "
-        f"{now[0]:04d}-{now[1]:02d}-{now[2]:02d} "
-        f"{now[3]:02d}:{now[4]:02d}:{now[5]:02d}"
-    )
-    return formatted_datetime
 
 # Connections
 try:

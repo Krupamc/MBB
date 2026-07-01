@@ -24,7 +24,7 @@ def set_datetime_from_tuple(dt_tuple):
 # Or get the local time from the system
 def set_datetime_from_system():
 
-    initial_time_tuple = time.localtime()  # tuple (microPython)
+    initial_time_tuple = time.gmtime() # tuple (microPython)
     initial_time_seconds = time.mktime(initial_time_tuple)  # local time in seconds
 
     # Convert to tuple compatible with the library

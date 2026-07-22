@@ -11,90 +11,92 @@ import ntptime
 #credentials
 ssid = cfg.ssid
 password = cfg.password
+network.hostname(cfg.hostname)
+
 
 led = Pin("LED", Pin.OUT) #led pin
 
 # make board led blink infinite for error
-def blink(): 
-    
+def blink():
+    print("ERROR")
     while True:
         led.value(1)
-        time.sleep(0.5) 
+        time.sleep(0.1)
         led.value(0)
-        time.sleep(0.5)
+        time.sleep(0.1)
+        
+def blink_limit(count: int):
+    for i in range(count):
+        led.value(1)
+        time.sleep(0.25)
+        led.value(0)
+        time.sleep(0.25)
+        led.value(1)
+        time.sleep(1.5)
+        led.value(0)
 
 # Connect to wifi
 def connect():
     wlan = network.WLAN(network.STA_IF)
+    network.hostname("MBB")
     wlan.active(True)
+    
+    
+    
+    if wlan.isconnected():
+        return wlan
+    
     wlan.connect(ssid, password)
-    network.hostname(cfg.hostname)
-
-    time_start = time.ticks_ms() # IF wifi buffers for more than X seconds, restart wifi.
+    time_start = time.ticks_ms() # timer for buffer
+    blink_limit(1)
+    
     while not wlan.isconnected():
-        if time.ticks_diff(time.ticks_ms(), time_start) > cfg.buffer_time * 1000:
-            break
-        time.sleep_ms(100)
+        status = wlan.status()
+        if status < 0:
+            raise RuntimeError(f"WIFI Failed, status={status}")
+        if time.ticks_diff(time.ticks_ms(), time_start) > (cfg.buffer_time * 1000):
+            raise RuntimeError("WiFi connection timeout")
+        print("Connecting...")
+        print()
+        time.sleep_ms(500)
+    
+    print("WIFI Connected:", wlan.ifconfig())
+    print()
     return wlan
 
 # Sync Time with NTP Server
 days_of_week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
-# Offset based on Timezone
-utc = cfg.utc_offset
-
 def sync_wifi_time():
-    try:
-        ntptime.settime()
-        print("Time Synced with NTP")
-
-    except Exception as e:
-        print("Error syncing time:", e)
+    blink_limit(1)
+    ntptime.settime()
+    print("Time Synced")
+    print()
 
 def formatted_time():
     year, month, day, hour, minute, second, _, _ = time.gmtime()
     return f"{year:04d}-{month:02d}-{day:02d}T{hour:02d}:{minute:02d}:{second:02d}Z"
 
 
-# Connections
+# Connecting
 try:
-    connect()
-    for i in range (3):
-        led.value(1)
-        time.sleep(0.25) 
-        led.value(0)
-        time.sleep(0.25)
-        led.value(1)
-        time.sleep(2)
-        led.value(0)
-    print("WIFI Connected")
+    wlan = connect()
         
-except OSError as e: # If really bad error, blink forever
+except OSError as e: # Blink forever
+    print("WIFI Error")
     blink()
-    print("Wifi Error")
 
+# Sync time
 try:
     sync_wifi_time()
-    for i in range (3):
-        led.value(1)
-        time.sleep(0.25) 
-        led.value(0)
-        time.sleep(0.25)
-        led.value(1)
-        time.sleep(2)
-        led.value(0)
-    print("Time Synced")
-
-except OSError as e: # If really bad error, blink forever
-    blink()
-    print("Time Error")
     
-# Sleep before program to give USBs more time to setup
-try: 
-    time.sleep_ms(200)
+    print("Current UTC:", formatted_time())
 
-except Exception:
-    pass
 
+except Exception as e:
+    print("Time Error:", e)
+    blink()
+    
+time.sleep_ms(200)
 
     

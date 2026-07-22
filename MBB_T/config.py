@@ -35,7 +35,7 @@ gps_rx = 1
 
 # Micro SD Card - SPI
 sd_spi_id = 0        # or 0
-sd_sck   = 18        # example
+sd_sck   = 18
 sd_mosi  = 19
 sd_miso  = 16
 sd_cs    = 17        # chip select

@@ -7,8 +7,6 @@ password = "1234" # I hope you know what this is...
 hostname = "My Buddy Buoy Receiver" # Name of the device on the WIFI network.
 buffer_time = 30 # How many seconds the pico will let wifi try to connect before trying again.
 
-# Time Zone:
-utc_offset = -5 # This is for EST
 # Buoy Name:
 buoy_name = "MBB_Receiver" # How Buoy is refered to in the program.
 

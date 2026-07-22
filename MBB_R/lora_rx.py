@@ -3,7 +3,7 @@
 
 from machine import Pin, SPI
 from time import sleep
-from lora import SX1262 #change lib folder to lora btw
+import sx1262 #change lib folder to lora btw
 import config as cfg # Config
 import boot
 import json
